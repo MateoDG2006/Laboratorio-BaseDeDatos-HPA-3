@@ -1,4 +1,4 @@
-# Laboratorio 3 – Gestión de Productos (Windows Forms + SQL Server)
+# Laboratorio Base De Datos – Gestión de Productos (Windows Forms + SQL Server)
 
 Aplicación de escritorio desarrollada en **C# con Windows Forms (.NET 10)** que permite administrar un catálogo de productos almacenados en una base de datos **SQL Server**. Cada producto tiene folio, nombre, precio, cantidad e imagen.
 
