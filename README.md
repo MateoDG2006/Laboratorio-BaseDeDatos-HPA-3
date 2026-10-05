@@ -1,4 +1,4 @@
-# Laboratorio 4 – CRUD de Productos con imágenes (Windows Forms + SQL Server)
+# Laboratorio Base De Datos – Gestión de Productos (Windows Forms + SQL Server)
 
 Aplicación de escritorio en **C# / Windows Forms (.NET 10)** que administra un inventario de productos (folio, nombre, precio, cantidad e imagen) guardado en **SQL Server**. Sigue la estructura del Laboratorio 4 (clase `Producto`, clase `Conexion`, `Dictionary<string, object>` para insertar, `MemoryStream` para convertir imágenes), adaptada de MySQL a SQL Server.
 
