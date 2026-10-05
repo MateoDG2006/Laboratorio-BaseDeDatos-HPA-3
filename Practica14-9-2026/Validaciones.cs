@@ -1,114 +1,71 @@
-﻿using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Globalization;
 
 namespace Practica14_9_2026
 {
-    internal class Validaciones
+    /// <summary>
+    /// Reglas de validación de los campos del producto.
+    /// Cada método devuelve null si el dato es correcto, o el mensaje de error a mostrar.
+    /// </summary>
+    internal static class Validaciones
     {
-        static public int validateID(string id)
+        // Límites que impone la tabla: NVARCHAR(100) y DECIMAL(10,2)
+        public const int LargoMaximoNombre = 100;
+        public const decimal PrecioMaximo = 99_999_999.99m;
+
+        // Límite razonable para no cargar fotos enormes en la tabla
+        public const long TamanoMaximoImagen = 5 * 1024 * 1024;
+
+        public static string? ValidarNombre(string nombre)
         {
-            BaseDeDatos database = new BaseDeDatos();
+            if (nombre.Equals(""))
+                return "Ingrese el Nombre del Producto";
 
-            database.AsegurarConexionAbierta();
+            if (nombre.Length > LargoMaximoNombre)
+                return $"El nombre no puede superar {LargoMaximoNombre} caracteres.";
 
-            if (!int.TryParse(id, out int numero) || numero <= 0)
-            {
-                MessageBox.Show("El ID debe ser un número entero mayor que cero.");
-            }
+            if (nombre.Any(char.IsDigit))
+                return "El nombre no puede contener números.";
 
-
-            const string query = @"
-                SELECT COALESCE(MAX(CAST(id AS BIGINT)), 0) + 1
-                FROM productos";
-
-            using (var cmd = new SqlCommand(query, database.connection))
-            {
-                long siguienteID = Convert.ToInt64(cmd.ExecuteScalar());
-
-                if (numero != siguienteID)
-                {
-                    numero = (int)siguienteID;
-                }
-            }
-
-            return numero;
-        }
-        static public string validateName(string name)
-        {
-            Regex regex_without_numbers = new Regex(@"^[^\d]+$");
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                MessageBox.Show("El nombre no puede estar vacío.");
-                return "";
-            }
-            if (!regex_without_numbers.IsMatch(name))
-            {
-                MessageBox.Show("El nombre no puede contener números.");
-                return "";
-            }
-
-            return name;
-        }
-        static public decimal validatePrice(object price)
-        {
-            decimal new_price = 0;
-            try
-            {
-                new_price = Convert.ToDecimal(price);
-                if (new_price <= 0)
-                {
-                    MessageBox.Show("El precio debe ser un número decimal mayor que cero.");
-                    return 0;
-                }
-                return new_price;
-            }
-            catch
-            {
-                MessageBox.Show("El precio debe ser un número decimal válido.");
-                return 0;
-            }
+            return null;
         }
 
-        static public int validateQuantity(object quantity)
+        public static string? ValidarPrecio(string texto, out decimal precio)
         {
-            if (int.TryParse(quantity.ToString(), out int new_quantity))
-            {
-                if (new_quantity <= 0)
-                {
-                    MessageBox.Show("La cantidad debe ser un número entero mayor que cero.");
-                    return 0;
-                }
-                return new_quantity;
-            }
-            else
-            {
-                MessageBox.Show("La cantidad debe ser un número entero válido.");
-                return 0;
-            }
+            precio = 0;
+
+            if (texto.Equals(""))
+                return "Ingrese el Precio";
+
+            // decimal.TryParse no lanza excepción: devuelve false si el texto no es un número
+            if (!decimal.TryParse(texto, NumberStyles.Number, CultureInfo.CurrentCulture, out precio))
+                return "Ingrese un Precio correcto";
+
+            if (precio <= 0)
+                return "El precio debe ser mayor que cero.";
+
+            if (precio > PrecioMaximo)
+                return $"El precio no puede ser mayor que {PrecioMaximo:N2}.";
+
+            if (decimal.Round(precio, 2) != precio)
+                return "El precio admite como máximo 2 decimales.";
+
+            return null;
         }
 
-    }
-    internal class ValidacionImagenes
-    {
-        static public bool validateImageBytes(byte[] imageData )
+        public static string? ValidarCantidad(string texto, out int cantidad)
         {
-            if (imageData == null || imageData.Length == 0)
-            {
-                return false;
-            }
-            return true;
-        }
-        static public bool validateImage(Image image)
-        {
-            if(image != null)
-            {
-                return true;
-            }
-            return false;
+            cantidad = 0;
+
+            if (texto.Equals(""))
+                return "Ingrese la Cantidad";
+
+            if (!int.TryParse(texto, out cantidad))
+                return "Ingrese una Cantidad correcta (número entero)";
+
+            if (cantidad <= 0)
+                return "La cantidad debe ser mayor que cero.";
+
+            return null;
         }
     }
 }
