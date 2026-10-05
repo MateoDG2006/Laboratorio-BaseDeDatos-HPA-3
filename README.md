@@ -1,4 +1,4 @@
-# Laboratorio Base De Datos – Gestión de Productos (Windows Forms + SQL Server)
+# Laboratorio 4 – CRUD de Productos con imágenes (Windows Forms + SQL Server)
 
 Aplicación de escritorio en **C# / Windows Forms (.NET 10)** que administra un inventario de productos (folio, nombre, precio, cantidad e imagen) guardado en **SQL Server**. Sigue la estructura del Laboratorio 4 (clase `Producto`, clase `Conexion`, `Dictionary<string, object>` para insertar, `MemoryStream` para convertir imágenes), adaptada de MySQL a SQL Server.
 
@@ -28,8 +28,8 @@ Aplicación de escritorio en **C# / Windows Forms (.NET 10)** que administra un 
 ```
 Practica14-9-2026.slnx
 Database/
-├── reset_productosdb.sql   # Formatea la tabla y recarga los 3 primeros productos
-└── reset_productosdb.cmd   # Ejecuta el script con sqlcmd (doble clic)
+├── 01_crear_productosdb.sql     # Crea la BD, la tabla y carga los 6 productos con imágenes
+└── 02_resetear_productosdb.sql  # Borra y recrea la BD con los 3 primeros productos
 Practica14-9-2026/
 ├── Program.cs
 ├── Form1.cs                # Eventos del formulario y lógica CRUD
@@ -52,12 +52,18 @@ CREATE TABLE productos (
 );
 ```
 
-### Reiniciar la base de datos
+### Scripts de la base de datos (`Database/`)
 
-`Database/reset_productosdb.sql` crea `productosdb` si no existe, guarda los **3 primeros productos actuales** (por `id`, con su imagen), recrea la tabla y los vuelve a insertar con folios 1, 2 y 3. Si hay menos de 3, completa con los datos de ejemplo del laboratorio. Corre en una transacción: si falla, no cambia nada.
+1. **`01_crear_productosdb.sql`**: crea `productosdb` y la tabla `productos` si no existen y carga los **6 productos del laboratorio con sus imágenes** (solo si la tabla está vacía). Se puede ejecutar varias veces sin perder datos.
+2. **`02_resetear_productosdb.sql`**: **elimina la base de datos completa**, la vuelve a crear y carga los **3 primeros productos** (Teclado, Mouse y Portátil con imagen) con folios 1, 2 y 3.
 
-- Desde **SSMS**: abrir el archivo y ejecutar (F5).
-- Desde Windows: doble clic en `reset_productosdb.cmd` (editar `SERVIDOR` si la instancia no es `Mateo`).
+Las imágenes vienen del volcado MySQL del laboratorio convertidas a `VARBINARY(MAX)`; los productos que tenían imagen vacía (`''`) quedan con `NULL`.
+
+Ejecutar en **SSMS** (abrir el archivo y F5) o con sqlcmd:
+
+```bash
+sqlcmd -S Mateo -E -C -f 65001 -i Database/02_resetear_productosdb.sql
+```
 
 ### Cadena de conexión
 
